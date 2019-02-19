@@ -3,51 +3,51 @@ import sys
 
 
 def main():
-    if (len(sys.argv) < 4):
+    if len(sys.argv) < 4:
         print('\nERROR: Missing Arugments\n')
         print('Usage:     filename.py <MaillistName> <AdminEmail@uci.edu> <AdminPswd>')
         print('Ex)    cmdArgEmails.py   soe-staff       hssoeit@uci.edu     ********  ')
         print('\nQuitting...')
         exit()
 
-    emailList = sys.argv[1]
+    email_list = sys.argv[1]
     email = sys.argv[2]
-    pwd = sys.argv[3]
+    password = sys.argv[3]
 
     emails = []
-    fname = emailList + '.txt'
+    file_name = email_list + '.txt'
 
-    print('MailList: ', emailList)
-    print('Password: ', pwd)
+    print('MailList: ', email_list)
+    print('Password: ', password)
 
-    r = requests.get(
-        'https://department-lists.uci.edu/mailman/roster/' + emailList + '?language=en&roster-email=' + email + '&roster-pw=' + pwd + '&SubscriberRoster=Visit+Subscriber+List')
+    r = requests.get('https://department-lists.uci.edu/mailman/roster/' + email_list
+                     + '?language=en&roster-email=' + email + '&roster-pw='
+                     + password + '&SubscriberRoster=Visit+Subscriber+List')
     data = r.text
     data = data.split('\n')
 
-    for i in range(len(data)):
-        if ('<li><a href=' in data[i]):
-            emailString = data[i]
-            emailString = emailString.strip('</a>')
-            start = emailString.rfind('>') + 1
-            emailString = emailString[start:]
-            emailString = emailString.replace(' at ', '@')
+    for line in data:
+        if '<li><a href=' in line:
+            email_string = line.strip('</a>')
+            start = email_string.rfind('>') + 1
+            email_string = email_string[start:]
+            email_string = email_string.replace(' at ', '@')
 
-            emails.append(emailString)
-            print(emailString)
+            emails.append(email_string)
+            print(email_string)
 
     print('\nDone retrieving emails')
     emails = sorted(list(set(emails)))
-    if (len(emails) == 0):
+    if len(emails) == 0:
         print("No emails retrieved, check maillist/credential spelling and try again")
         exit(1)
 
-    print('\n\nWriting to File:', fname)
+    print('\n\nWriting to File:', file_name)
 
-    with(open(fname, 'w')) as file:
+    with(open(file_name, 'w')) as file:
         file.write('\n'.join(emails))
 
-    print(fname, ' saved!')
+    print(file_name, ' saved!')
 
 
 main()
